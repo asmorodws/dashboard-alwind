@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html
+lang="en"
+x-data="{ 
+    darkMode: localStorage.getItem('darkMode') || 'light',
+    activeNav: 'explorer',
+    sideNavItems: [
+        { id: 'explorer', icon: 'M3 6l9-4 9 4v12l-9 4-9-4V6z', tooltip: 'Explorer' },
+        { id: 'search', icon: 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z', tooltip: 'Search' },
+        { id: 'git', icon: 'M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4', tooltip: 'Source Control' },
+        { id: 'extensions', icon: 'M4 6h16M4 12h16M4 18h16', tooltip: 'Extensions' }
+    ],
+    files: [
+        { name: 'index.html', type: 'html', icon: 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z' },
+        { name: 'styles.css', type: 'css', icon: 'M4 6h16M4 12h16M4 18h16' },
+        { name: 'script.js', type: 'js', icon: 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253' },
+        { name: 'package.json', type: 'json', icon: 'M4 6h16M4 12h16M4 18h16' }
+    ]
+}"
+x-init="$watch('darkMode', value => localStorage.setItem('darkMode', value))"
+:class="{ 'dark': darkMode === 'dark' }">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VS Code Style Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class'
+        }
+    </script>
+</head>
+
+<body class="bg-white dark:bg-neutral-950 transition-colors duration-200">
+    <div class="flex h-screen">
+        <!-- Sidenav -->
+        <div class="w-16 bg-gray-100 dark:bg-neutral-950 border-r border-gray-200 dark:border-zinc-800">
+            <div class="flex flex-col items-center py-4">
+                <template x-for="item in sideNavItems" :key="item.id">
+                    <div class="relative group">
+                        <button 
+                            @click="activeNav = item.id"
+                            class="p-3 mb-2 rounded-lg hover:bg-gray-200 dark:hover:bg-zinc-800 transition-colors duration-200"
+                            :class="{ 'bg-gray-200 dark:bg-zinc-800': activeNav === item.id }">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-700 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="item.icon" />
+                            </svg>
+                        </button>
+                        <!-- Tooltip -->
+                        <div class="absolute left-16 top-2 hidden group-hover:block">
+                            <div class="bg-neutral-950 text-white text-sm px-2 py-1 rounded shadow-lg shadow-black/50">
+                                <span x-text="item.tooltip"></span>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+
+        <!-- Secondary Navigation -->
+        <div class="w-96 bg-white dark:bg-neutral-950 border-r border-gray-200 dark:border-zinc-800">
+            <div class="h-16 flex items-center justify-between px-4 border-b border-gray-200 dark:border-zinc-800">
+                <h2 class="text-lg font-semibold text-gray-700 dark:text-gray-200" x-text="activeNav === 'explorer' ? 'Explorer' : activeNav === 'search' ? 'Search' : activeNav === 'git' ? 'Source Control' : 'Extensions'"></h2>
+                <button class="p-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white transition-colors duration-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                </button>
+            </div>
+            <div class="overflow-y-auto h-[calc(100vh-4rem)]">
+                <div x-show="activeNav === 'explorer'" class="divide-y dark:divide-zinc-800">
+                    <template x-for="file in files" :key="file.name">
+                        <div class="flex items-center py-3 px-4 hover:bg-gray-100 dark:hover:bg-zinc-800 cursor-pointer transition-colors duration-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-gray-600 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="file.icon" />
+                            </svg>
+                            <div>
+                                <span class="text-sm text-gray-700 dark:text-gray-300" x-text="file.name"></span>
+                                <p class="text-xs text-gray-500 dark:text-gray-400" x-text="'Type: ' + file.type"></p>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+
+                <div x-show="activeNav === 'search'" class="p-4">
+                    <div class="text-sm text-gray-700 dark:text-gray-300">No search results</div>
+                </div>
+
+                <div x-show="activeNav === 'git'" class="p-4">
+                    <div class="text-sm text-gray-700 dark:text-gray-300">No changes</div>
+                </div>
+
+                <div x-show="activeNav === 'extensions'" class="p-4">
+                    <div class="text-sm text-gray-700 dark:text-gray-300">No extensions installed</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col">
+            <!-- Header -->
+            <header class="h-12 bg-gray-100 dark:bg-neutral-950 border-b border-gray-200 dark:border-zinc-800 flex items-center px-4">
+                <div class="flex-1">
+                    <div class="max-w-lg">
+                        <input type="text" placeholder="Search..." class="w-full px-4 py-1 rounded-lg bg-gray-200 dark:bg-zinc-800 text-gray-700 dark:text-gray-200 focus:outline-none">
+                    </div>
+                </div>
+                <button 
+                    @click="darkMode = darkMode === 'dark' ? 'light' : 'dark'"
+                    class="ml-4 p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-zinc-800 transition-colors duration-200">
+                    <svg x-show="darkMode === 'light'" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                    </svg>
+                    <svg x-show="darkMode === 'dark'" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                </button>
+            </header>
+
+            <!-- Content Area -->
+            <div class="flex-1 overflow-auto p-4 dark:bg-neutral-900">
+                <div x-show="activeNav === 'explorer'" class="space-y-2">
+                    <div class="flex items-center text-gray-700 dark:text-gray-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                        </svg>
+                        <span>Project Files</span>
+                    </div>
+                </div>
+                <div x-show="activeNav === 'search'" class="space-y-2">
+                    <div class="text-gray-700 dark:text-gray-300">Search Results</div>
+                </div>
+                <div x-show="activeNav === 'git'" class="space-y-2">
+                    <div class="text-gray-700 dark:text-gray-300">Source Control</div>
+                </div>
+                <div x-show="activeNav === 'extensions'" class="space-y-2">
+                    <div class="text-gray-700 dark:text-gray-300">Extensions</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
